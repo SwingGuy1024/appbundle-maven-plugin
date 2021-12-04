@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.xml.stream.XMLInputFactory;
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.SystemUtils; // fixes builds for Java 10+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
@@ -57,6 +57,7 @@ import sh.tak.appbundler.logging.MojoLogChute;
  * @phase package
  * @requiresDependencyResolution runtime
  */
+@SuppressWarnings({"HardCodedStringLiteral", "StringConcatenation", "HardcodedFileSeparator", "MagicCharacter"})
 public class CreateApplicationBundleMojo extends AbstractMojo {
 
     /**
@@ -72,7 +73,8 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
     /**
      * Default JVM options passed to launcher
      */
-    private static String[] defaultJvmOptions = {"-Dapple.laf.useScreenMenuBar=true"};
+    private static final String[] defaultJvmOptions = {"-Dapple.laf.useScreenMenuBar=true"};
+    private static final String[] EMPTY_STRING_ARRAY = {};
 
     /**
      * signals the Info.plit creator that a JRE is present.
@@ -105,18 +107,18 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
 
     /**
      * Paths to be put on the classpath in addition to the projects
-     * dependencies. <br/><br/>
+     * dependencies. <br><br>
      * Might be useful to specify locations of dependencies in the provided
      * scope that are not distributed with the bundle but have a known location
-     * on the system. <br/><br/>
+     * on the system. <br><br>
      *
-     * @see http://jira.codehaus.org/browse/MOJO-874
+     * @see <a href="http://jira.codehaus.org/browse/MOJO-874">jira.codehaus.org/browse/MOJO-874</a>
      * @parameter
      */
     private List<String> additionalClasspath;
 
     /**
-     * Additional resources (as a list of <code>FileSet</code> objects) that
+     * Additional resources (as a list of {@code FileSet} objects) that
      * will be copied into the build directory and included in the .dmg
      * alongside with the application bundle.
      *
@@ -126,7 +128,7 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
 
     /**
      * Additional files to bundle inside the Resources/Java directory and
-     * include on the classpath. <br/><br/>
+     * include on the classpath. <br><br>
      * These could include additional JARs or JNI libraries.
      *
      * @parameter
@@ -142,7 +144,7 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
     private File buildDirectory;
 
     /**
-     * The name of the Bundle. <br/><br/>
+     * The name of the Bundle. <br><br>
      * This is the name that is given to the application bundle; and it is also
      * what will show up in the application menu, dock etc.
      *
@@ -152,7 +154,7 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
     private String bundleName;
 
     /**
-     * The location of the template for <code>Info.plist</code>. <br/><br/>
+     * The location of the template for {@code Info.plist}. <br><br>
      *
      * Classpath is checked before the file system.
      *
@@ -161,8 +163,8 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
     private String dictionaryFile;
 
     /**
-     * The location of the generated disk image (.dmg) file. <br/><br/>
-     * This property depends on the <code>generateDiskImageFile</code> property.
+     * The location of the generated disk image (.dmg) file. <br><br>
+     * This property depends on the {@code generateDiskImageFile} property.
      *
      * @parameter
      * default-value="${project.build.directory}/${project.build.finalName}.dmg"
@@ -170,10 +172,10 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
     private File diskImageFile;
 
     /**
-     * If this is set to <code>true</code>, the generated disk image (.dmg) file
-     * will be internet-enabled. <br/><br/>
+     * If this is set to {@code true}, the generated disk image (.dmg) file
+     * will be internet-enabled. <br><br>
      * The default is ${false}. This property depends on the
-     * <code>generateDiskImageFile</code> property.
+     * {@code generateDiskImageFile} property.
      *
      * This feature can only be executed in Mac OS X environments.
      *
@@ -182,7 +184,7 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
     private boolean diskImageInternetEnable;
 
     /**
-     * Tells whether to generate the disk image (.dmg) file or not. <br/><br/>
+     * Tells whether to generate the disk image (.dmg) file or not. <br><br>
      * This feature can only be executed in Mac OS X and Linux environments.
      *
      * @parameter default-value="false"
@@ -190,7 +192,7 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
     private boolean generateDiskImageFile;
 
     /**
-     * Tells whether to include a symbolic link to the generated disk image (.dmg) file or not. <br/><br/>
+     * Tells whether to include a symbolic link to the generated disk image (.dmg) file or not. <br><br>
      * Relevant only if generateDiskImageFile is set.
      *
      * @parameter default-value="false"
@@ -214,15 +216,15 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
     private String javaLauncherName;
 
     /**
-     * Options to the JVM, will be used as the value of <code>JVMOptions</code>
-     * in the <code>Info.plist</code>.
+     * Options to the JVM, will be used as the value of {@code JVMOptions}
+     * in the {@code Info.plist}.
      *
      * @parameter
      */
     private List<String> jvmOptions;
 
     /**
-     * The value for the <code>JVMVersion</code> key.
+     * The value for the {@code JVMVersion} key.
      *
      * @parameter default-value="1.6+"
      */
@@ -237,28 +239,28 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
     private String mainClass;
 
     /**
-     * The version of the project. <br/><br/>
-     * Will be used as the value of the <code>CFBundleVersion</code> key.
+     * The version of the project. <br><br>
+     * Will be used as the value of the {@code CFBundleVersion} key.
      *
      * @parameter default-value="${project.version}"
      */
     private String version;
 
     /**
-     * The path to the working directory. <br/>
-     * This can be inside or outside the app bundle. <br/>
+     * The path to the working directory. <br>
+     * This can be inside or outside the app bundle. <br>
      * To define a working directory <b>inside</b> the app bundle, use e.g.
-     * <code>$APP_ROOT</code>.
+     * {@code $APP_ROOT}.
      *
      * @parameter default-value="$APP_ROOT"
      */
     private String workingDirectory;
 
     /**
-     * The path to the working directory. <br/>
-     * This can be inside or outside the app bundle. <br/>
+     * The path to the working directory. <br>
+     * This can be inside or outside the app bundle. <br>
      * To define a working directory <b>inside</b> the app bundle, use e.g.
-     * <code>$APP_ROOT</code>.
+     * {@code $APP_ROOT}.
      *
      * @parameter default-value=""
      */
@@ -328,7 +330,7 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
         if (iconFile != null) {
             File f = searchFile(iconFile, project.getBasedir());
 
-            if (f != null && f.exists() && f.isFile()) {
+            if ((f != null) && f.exists() && f.isFile()) {
                 getLog().info("Copying the Icon File");
                 try {
                     FileUtils.copyFileToDirectory(f, resourcesDir);
@@ -343,7 +345,7 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
         // 4. Resolve and copy in all dependencies from the pom
         getLog().info("Copying dependencies");
         List<String> files = copyDependencies(javaDirectory);
-        if (additionalBundledClasspathResources != null && !additionalBundledClasspathResources.isEmpty()) {
+        if ((additionalBundledClasspathResources != null) && !additionalBundledClasspathResources.isEmpty()) {
             files.addAll(copyAdditionalBundledClasspathResources(javaDirectory, "lib", additionalBundledClasspathResources));
         }
 
@@ -361,11 +363,11 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
                 }
 
                 try {
-                    getLog().info("Copying the JRE Folder from : [" + sourceFolder + "] to PlugIn folder: [" + pluginsDirectory + "]");
+                    getLog().info("Copying the JRE Folder from : [" + sourceFolder + "] to PlugIn folder: [" + pluginsDirectory + ']');
                     FileUtils.copyDirectoryStructure(sourceFolder, pluginsDirectory);
                     File binFolder = new File(pluginsDirectory, "bin");
                     //Setting execute permissions on executables in JRE
-                    for (String filename : binFolder.list()) {
+                    for (String filename : emptyIfNull(binFolder.list())) {
                         new File(binFolder, filename).setExecutable(true, false);
                     }
 
@@ -378,7 +380,7 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
                 getLog().warn("JRE not found check jrePath setting in pom.xml");
             }
         } else if (jreFullPath != null){
-            getLog().info("JRE Full path is used [" + jreFullPath + "]");
+            getLog().info("JRE Full path is used [" + jreFullPath + ']');
             embeddJre = true;
         }
 
@@ -389,7 +391,7 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
 
         // 7. Copy specified additional resources into the top level directory
         getLog().info("Copying additional resources");
-        if (additionalResources != null && !additionalResources.isEmpty()) {
+        if ((additionalResources != null) && !additionalResources.isEmpty()) {
             this.copyResources(buildDirectory, additionalResources);
         }
 
@@ -404,7 +406,7 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
 
                 chmod.execute();
             } catch (CommandLineException e) {
-                throw new MojoExecutionException("Error executing " + chmod + " ", e);
+                throw new MojoExecutionException("Error executing " + chmod + ' ', e);
             }
         } else {
             getLog().warn("The stub was created without executable file permissions for UNIX systems");
@@ -606,10 +608,10 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
         velocityContext.put("bundleName", cleanBundleName(bundleName));
         velocityContext.put("workingDirectory", workingDirectory);
 
-        if (embeddJre && jrePath != null) {
+        if (embeddJre && (jrePath != null)) {
             velocityContext.put("jrePath", "JRE");
             velocityContext.put("jreFullPath", "");
-        } else if (embeddJre && jreFullPath != null) {
+        } else if (embeddJre && (jreFullPath != null)) {
             velocityContext.put("jrePath", "");
             velocityContext.put("jreFullPath", jreFullPath);
         } else {
@@ -621,7 +623,7 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
             velocityContext.put("iconFile", "GenericJavaApp.icns");
         } else {
             File f = searchFile(iconFile, project.getBasedir());
-            velocityContext.put("iconFile", (f != null && f.exists() && f.isFile()) ? f.getName() : "GenericJavaApp.icns");
+            velocityContext.put("iconFile", ((f != null) && f.exists() && f.isFile()) ? f.getName() : "GenericJavaApp.icns");
         }
 
         velocityContext.put("version", version);
@@ -631,14 +633,14 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
         options.append("<array>").append("\n      ");
 
         for (String jvmOption : defaultJvmOptions) {
-            options.append("      ").append("<string>").append(jvmOption).append("</string>").append("\n");
+            options.append("      ").append("<string>").append(jvmOption).append("</string>").append('\n');
         }
 
-        options.append("      ").append("<string>").append("-Xdock:name=" + bundleName).append("</string>").append("\n");
+        options.append("      ").append("<string>").append("-Xdock:name=" + bundleName).append("</string>").append('\n');
 
         if (jvmOptions != null) {
             for (String jvmOption : jvmOptions) {
-                options.append("      ").append("<string>").append(jvmOption).append("</string>").append("\n");
+                options.append("      ").append("<string>").append(jvmOption).append("</string>").append('\n');
             }
         }
 
@@ -646,9 +648,9 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
         velocityContext.put("jvmOptions", options);
 
         StringBuilder jarFiles = new StringBuilder();
-        jarFiles.append("<array>").append("\n");
+        jarFiles.append("<array>").append('\n');
         for (String file : files) {
-            jarFiles.append("      ").append("<string>").append(file).append("</string>").append("\n");
+            jarFiles.append("      ").append("<string>").append(file).append("</string>").append('\n');
         }
 
         if (additionalClasspath != null) {
@@ -702,23 +704,22 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
     /**
      * Scan a fileset and get a list of files which it contains.
      *
-     * @param fileset
+     * @param fileSet The FileSet
      * @return list of files contained within a fileset.
-     * @throws FileNotFoundException
      */
     private List<String> scanFileSet(File sourceDirectory, FileSet fileSet) {
-        final String[] emptyStringArray = {};
+        final String[] emptyStringArray = EMPTY_STRING_ARRAY;
 
         DirectoryScanner scanner = new DirectoryScanner();
 
         scanner.setBasedir(sourceDirectory);
-        if (fileSet.getIncludes() != null && !fileSet.getIncludes().isEmpty()) {
+        if ((fileSet.getIncludes() != null) && !fileSet.getIncludes().isEmpty()) {
             scanner.setIncludes(fileSet.getIncludes().toArray(emptyStringArray));
         } else {
             scanner.setIncludes(DEFAULT_INCLUDES);
         }
 
-        if (fileSet.getExcludes() != null && !fileSet.getExcludes().isEmpty()) {
+        if ((fileSet.getExcludes() != null) && !fileSet.getExcludes().isEmpty()) {
             scanner.setExcludes(fileSet.getExcludes().toArray(emptyStringArray));
         }
 
@@ -821,5 +822,10 @@ public class CreateApplicationBundleMojo extends AbstractMojo {
             throw new MojoExecutionException("Error cleaning up (while removing " + symlink +
                     " symlink.) Please check permissions for that symlink" + diskImageFile, ex);
         }
+    }
+    
+    @SuppressWarnings({"unchecked", "SuspiciousArrayCast"})
+    public static String[] emptyIfNull(String[] array) {
+        return (array == null) ? EMPTY_STRING_ARRAY : array;
     }
 }

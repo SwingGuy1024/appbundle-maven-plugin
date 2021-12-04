@@ -1,3 +1,7 @@
+#### _Fork Note:_
+
+_This is a fork of the useful GitHub project at https://github.com/federkasten/appbundle-maven-plugin, which is useful but out-of-date. That project was built using Java 1.6, and will not bundle applications running JDKs later than 1.9. This updates the source to Java 1.8, and fixes the minor bug that causes failure when using with Java 1.10+. Curiously, it still fails when building under Java 15, but works fine with later and earlier versions. I have tested it with all versions of Java from 8 through 17, and it only fails with Java 15. I haven't bothered to look into the Java 15 bug._
+
 # appbundle-maven-plugin
 
 Maven plugin that creates an Application Bundle for OS X containing all your project dependencies and the necessary metadata.

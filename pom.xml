@@ -59,7 +59,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.5.1</version>
         <configuration>
-          <target>1.6</target>
+          <target>8</target>
+          <source>8</source>
         </configuration>
       </plugin>
     </plugins>
@@ -85,28 +86,29 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
-      <version>3.3.9</version>
+      <version>${maven-plugin-api.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
-      <version>3.3.9</version>
+      <version>${maven-plugin-api.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
-      <version>3.3.9</version>
+      <version>${maven-plugin-api.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
-      <version>3.3.9</version>
+      <version>${maven-plugin-api.version}</version>
     </dependency>
   </dependencies>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.javadoc.skip>true</maven.javadoc.skip>
+    <maven-plugin-api.version>3.8.1</maven-plugin-api.version>
   </properties>
 
   <profiles>
